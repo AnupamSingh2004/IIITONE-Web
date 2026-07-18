@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useSearch } from "@/hooks/use-materials";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { SearchFilters, type FilterState } from "@/components/materials/SearchFilters";
 import { MaterialCard } from "@/components/materials/MaterialCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BrowsePage() {
   const [filters, setFilters] = useState<FilterState>({ q: "", type: "all" });
-  const { data, isLoading } = useSearch({ q: filters.q, type: filters.type === "all" ? undefined : filters.type });
+  const debouncedQuery = useDebouncedValue(filters.q, 300);
+  const { data, isLoading } = useSearch({ q: debouncedQuery, type: filters.type === "all" ? undefined : filters.type });
 
   return (
     <div className="space-y-6">
@@ -18,13 +20,13 @@ export default function BrowsePage() {
       </div>
       <SearchFilters value={filters} onChange={setFilters} />
 
-      {isLoading && filters.q && (
+      {isLoading && debouncedQuery && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-lg" />)}
         </div>
       )}
 
-      {!filters.q && (
+      {!debouncedQuery && (
         <div className="rounded-lg border border-dashed border-border py-16 text-center text-muted-foreground">
           Start typing to search across course materials.
         </div>
@@ -32,7 +34,7 @@ export default function BrowsePage() {
 
       {data && data.length === 0 && (
         <div className="rounded-lg border border-dashed border-border py-16 text-center text-muted-foreground">
-          No results for &quot;{filters.q}&quot;. Try a different keyword.
+          No results for &quot;{debouncedQuery}&quot;. Try a different keyword.
         </div>
       )}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import type { MaterialSummary } from "@/components/materials/MaterialCard";
 
@@ -21,6 +21,7 @@ export function useSearch(params: SearchParams) {
       return apiFetch<MaterialSummary[]>(`/api/search?${qs.toString()}`);
     },
     enabled: Boolean(params.q),
+    placeholderData: keepPreviousData,
   });
 }
 
