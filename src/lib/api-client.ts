@@ -1,3 +1,9 @@
+if (process.env.NODE_ENV === "production" && !process.env.NEXT_PUBLIC_API_URL) {
+  console.error(
+    "NEXT_PUBLIC_API_URL is not set in this production build — API calls will fall back to http://localhost:8080."
+  );
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
 export class ApiError extends Error {
