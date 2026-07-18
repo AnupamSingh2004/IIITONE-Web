@@ -35,6 +35,7 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -64,6 +65,7 @@
   --accent: hsl(255 60% 96%);
   --accent-foreground: hsl(255 60% 30%);
   --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(0 0% 100%);
   --border: hsl(240 6% 88%);
   --input: hsl(240 6% 88%);
   --ring: hsl(255 60% 50%);
@@ -99,6 +101,7 @@
   --accent: hsl(255 40% 18%);
   --accent-foreground: hsl(255 70% 85%);
   --destructive: hsl(0 63% 55%);
+  --destructive-foreground: hsl(0 0% 100%);
   --border: hsl(240 6% 20%);
   --input: hsl(240 6% 20%);
   --ring: hsl(255 70% 65%);
