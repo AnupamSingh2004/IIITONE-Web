@@ -1,7 +1,29 @@
-// Placeholder for Task 4 (app shell layout). Task 5 will replace this with the
-// real session hook (auth state, user profile, role) backed by the API client.
-type SessionUser = { role: "student" | "admin" } | null;
+"use client";
 
-export function useSession(): { user: SessionUser } {
-  return { user: null };
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch, ApiError } from "@/lib/api-client";
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: "student" | "admin";
+  branch?: string;
+  year?: number;
+}
+
+export function useSession() {
+  const query = useQuery({
+    queryKey: ["me"],
+    queryFn: async () => {
+      try {
+        return await apiFetch<User>("/api/me");
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 401) return null;
+        throw err;
+      }
+    },
+  });
+
+  return { user: query.data ?? null, isLoading: query.isLoading, refetch: query.refetch };
 }
