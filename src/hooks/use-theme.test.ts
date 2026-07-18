@@ -18,4 +18,13 @@ describe("useTheme", () => {
     expect(document.documentElement.classList.contains("dark")).toBe(true);
     expect(localStorage.getItem("iiitone-theme")).toBe("dark");
   });
+
+  it("reads a previously-persisted theme on mount", () => {
+    localStorage.setItem("iiitone-theme", "dark");
+
+    const { result } = renderHook(() => useTheme());
+
+    expect(result.current.theme).toBe("dark");
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+  });
 });
