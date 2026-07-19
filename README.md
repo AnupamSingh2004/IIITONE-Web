@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IIITOne — Web
 
-## Getting Started
+Next.js (App Router) frontend for **IIITOne**, the academic resource hub for IIIT Jabalpur (IIITDMJ) students — Google-login-gated browse/search of notes and PYQs, upload with an inline PDF viewer, and admin moderation screens.
 
-First, run the development server:
+This repo covers **Phase 1 (Academic Resource Hub)** only. See `docs/superpowers/plans/2026-07-17-frontend-phase1.md` for the full task-by-task plan and `../iiitone-backend/docs/superpowers/specs/` for the approved design spec.
+
+> **Status: work in progress.** Scaffold, design system, API client, app shell, auth guards, and the browse/search page are implemented and tested. Material detail/PDF viewer, upload, profile, and admin pages are still in progress. This frontend also depends on the sibling `iiitone-backend` repo — until that backend's router/handlers are fully wired (see its README), authenticated flows here have nothing real to talk to.
+
+## Tech stack
+
+- Next.js 16 (App Router, TypeScript) — note: this is a recent major version with some API differences from Next 14; see `AGENTS.md` in this repo if something in App Router behavior looks unfamiliar
+- Tailwind CSS v4 (CSS-first config, no `tailwind.config.ts`) + [shadcn/ui](https://ui.shadcn.com) on top of [Base UI](https://base-ui.com) primitives (not Radix — this affects a few component APIs, e.g. `Button` uses a `render` prop instead of `asChild`)
+- [TanStack Query](https://tanstack.com/query) for server state
+- [Sonner](https://sonner.emilkowal.ski) for toasts (shadcn's classic `toast` component is deprecated in the installed CLI version)
+- `react-pdf` for the inline PDF viewer (planned, Task 7)
+- Vitest + React Testing Library
+
+## Prerequisites
+
+- Node 20+
+- The `iiitone-backend` repo running locally for any authenticated flow to actually work (see its README)
+
+## Local dev setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # points NEXT_PUBLIC_API_URL at the local backend
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+npx vitest run       # run tests
+npm run build         # production build
+npm run lint           # lint
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project layout
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+src/
+  app/
+    page.tsx            landing/login page
+    layout.tsx           root layout (fonts, providers, theme flash-guard script)
+    providers.tsx         QueryClientProvider + Toaster
+    app/                  the authenticated /app/* URL segment (yes, app/app — see note below)
+      layout.tsx           RequireAuth + AppShell
+      page.tsx              browse/search page
+      admin/                 RequireAdmin-gated routes
+  components/
+    ui/                    shadcn-generated primitives (Base UI-backed)
+    layout/                 AppShell, ThemeToggle
+    auth/                   RequireAuth, RequireAdmin
+    materials/               MaterialCard, SearchFilters, (PdfViewer, CourseCombobox — in progress)
+  hooks/                    use-session, use-theme, use-debounced-value, use-materials
+  lib/                      api-client.ts (typed fetch wrapper, always sends credentials)
+```
 
-## Learn More
+**Routing note:** the App Router's own root is `src/app/`; the product's authenticated URL prefix is also `/app`, so the authenticated route tree lives at `src/app/app/` — a folder literally named `app` nested inside the framework's `app` directory. Not a typo.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment target (not yet wired)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Cloudflare Pages via `@cloudflare/next-on-pages` (backend on Azure — see `iiitone-backend`'s README). Not set up yet; this is a target, not a working pipeline.
