@@ -13,6 +13,20 @@ import { useCourses } from "@/hooks/use-materials";
 import { useUploadMaterial } from "@/hooks/use-upload";
 import { useSession } from "@/hooks/use-session";
 
+const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB, matches backend's max upload size
+
+// Shared by both the file-picker and drag-and-drop paths so neither can bypass
+// the other's validation. Returns an error message, or null if the file is acceptable.
+export function validateUploadFile(file: File): string | null {
+  if (file.type !== "application/pdf") {
+    return "Only PDF files are accepted.";
+  }
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    return "File is too large (max 50MB).";
+  }
+  return null;
+}
+
 export default function UploadPage() {
   const { user } = useSession();
   const router = useRouter();
@@ -25,7 +39,17 @@ export default function UploadPage() {
   const { data: courses = [] } = useCourses(user?.branch, user?.year, semester);
   const upload = useUploadMaterial();
 
-  const canSubmit = file && title && course?.name;
+  const hasCompleteProfile = Boolean(user?.branch && user?.year);
+  const canSubmit = file && title && course?.name && hasCompleteProfile;
+
+  const acceptFile = (candidate: File) => {
+    const error = validateUploadFile(candidate);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    setFile(candidate);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +91,7 @@ export default function UploadPage() {
             e.preventDefault();
             setIsDragActive(false);
             const dropped = e.dataTransfer.files?.[0];
-            if (dropped) setFile(dropped);
+            if (dropped) acceptFile(dropped);
           }}
           className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
             isDragActive
@@ -85,7 +109,10 @@ export default function UploadPage() {
             type="file"
             accept="application/pdf"
             className="hidden"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            onChange={(e) => {
+              const picked = e.target.files?.[0];
+              if (picked) acceptFile(picked);
+            }}
           />
         </label>
 
@@ -134,6 +161,12 @@ export default function UploadPage() {
           <Label>Course</Label>
           <CourseCombobox courses={courses} value={course} onChange={setCourse} />
         </div>
+
+        {!hasCompleteProfile && (
+          <p className="text-sm text-destructive">
+            Add your branch and year to your profile before uploading.
+          </p>
+        )}
 
         <Button type="submit" className="w-full" disabled={!canSubmit || upload.isPending}>
           {upload.isPending ? "Uploading..." : "Upload"}
