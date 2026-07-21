@@ -15,17 +15,25 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 export function PdfViewer({ fileUrl }: { fileUrl: string }) {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
+  const [loadError, setLoadError] = useState(false);
 
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="w-full overflow-auto rounded-lg border border-border bg-muted/30 p-4">
-        <Document
-          file={fileUrl}
-          onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-          loading={<div className="p-8 text-center text-muted-foreground">Loading document...</div>}
-        >
-          <Page pageNumber={pageNumber} renderTextLayer renderAnnotationLayer />
-        </Document>
+        {loadError ? (
+          <p className="p-8 text-center text-destructive">
+            Couldn&apos;t load this document. Try downloading it instead.
+          </p>
+        ) : (
+          <Document
+            file={fileUrl}
+            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            onLoadError={() => setLoadError(true)}
+            loading={<div className="p-8 text-center text-muted-foreground">Loading document...</div>}
+          >
+            <Page pageNumber={pageNumber} renderTextLayer renderAnnotationLayer />
+          </Document>
+        )}
       </div>
       {numPages > 0 && (
         <div className="flex items-center gap-3">

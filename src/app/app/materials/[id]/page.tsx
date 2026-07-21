@@ -24,7 +24,7 @@ interface MaterialDetail {
 
 export default function MaterialDetailPage() {
   const params = useParams<{ id: string }>();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["material", params.id],
     queryFn: () => apiFetch<MaterialDetail>(`/api/materials/${params.id}`),
   });
@@ -37,7 +37,13 @@ export default function MaterialDetailPage() {
       </div>
     );
   }
-  if (!data) return null;
+  if (isError || !data) {
+    return (
+      <div className="rounded-lg border border-dashed border-border py-16 text-center text-muted-foreground">
+        This material couldn&apos;t be found. It may have been removed.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
