@@ -58,26 +58,33 @@ export default function AdminPendingPage() {
                 <span>{m.courseName}</span>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1"
-                disabled={approve.isPending || reject.isPending}
-                onClick={() => approve.mutate(m.id)}
-              >
-                <Check className="h-4 w-4" /> Approve
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1 text-destructive hover:bg-destructive/10"
-                disabled={approve.isPending || reject.isPending}
-                onClick={() => reject.mutate(m.id)}
-              >
-                <X className="h-4 w-4" /> Reject
-              </Button>
-            </div>
+            {(() => {
+              const approvingThis = approve.isPending && approve.variables === m.id;
+              const rejectingThis = reject.isPending && reject.variables === m.id;
+              const rowBusy = approvingThis || rejectingThis;
+              return (
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1"
+                    disabled={rowBusy}
+                    onClick={() => approve.mutate(m.id)}
+                  >
+                    <Check className="h-4 w-4" /> {approvingThis ? "Approving..." : "Approve"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1 text-destructive hover:bg-destructive/10"
+                    disabled={rowBusy}
+                    onClick={() => reject.mutate(m.id)}
+                  >
+                    <X className="h-4 w-4" /> {rejectingThis ? "Rejecting..." : "Reject"}
+                  </Button>
+                </div>
+              );
+            })()}
           </div>
         ))}
       </div>
