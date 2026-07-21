@@ -3,11 +3,19 @@ import { render, screen } from "@testing-library/react";
 import { PdfViewer } from "./PdfViewer";
 
 vi.mock("react-pdf", () => ({
-  Document: ({ children, onLoadSuccess }: any) => {
+  Document: ({
+    children,
+    onLoadSuccess,
+  }: {
+    children: React.ReactNode;
+    onLoadSuccess?: (info: { numPages: number }) => void;
+  }) => {
     onLoadSuccess?.({ numPages: 3 });
     return <div data-testid="pdf-document">{children}</div>;
   },
-  Page: ({ pageNumber }: any) => <div data-testid={`pdf-page-${pageNumber}`} />,
+  Page: ({ pageNumber }: { pageNumber: number }) => (
+    <div data-testid={`pdf-page-${pageNumber}`} />
+  ),
   pdfjs: { GlobalWorkerOptions: {} },
 }));
 
