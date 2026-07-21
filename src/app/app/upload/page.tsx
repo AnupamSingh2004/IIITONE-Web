@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -164,7 +165,11 @@ export default function UploadPage() {
 
         {!hasCompleteProfile && (
           <p className="text-sm text-destructive">
-            Add your branch and year to your profile before uploading.
+            Add your branch and year to your{" "}
+            <Link href="/app/profile" className="underline">
+              profile
+            </Link>{" "}
+            before uploading.
           </p>
         )}
 
