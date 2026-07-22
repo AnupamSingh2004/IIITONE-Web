@@ -57,6 +57,8 @@ src/
 
 **Routing note:** the App Router's own root is `src/app/`; the product's authenticated URL prefix is also `/app`, so the authenticated route tree lives at `src/app/app/` — a folder literally named `app` nested inside the framework's `app` directory. Not a typo.
 
-## Deployment target (not yet wired)
+## Deployment target
 
-Cloudflare Pages via `@cloudflare/next-on-pages` (backend on Azure — see `iiitone-backend`'s README). Not set up yet; this is a target, not a working pipeline.
+Cloudflare Pages via `@cloudflare/next-on-pages` (backend on Azure — see `iiitone-backend`'s README). CI (`.github/workflows/ci.yml`) runs typecheck, lint, tests, `next build`, and `npm run pages:build` (the Cloudflare adapter build) on every push/PR to `main`. The Cloudflare Pages *project* itself (dashboard git integration, build command `npx @cloudflare/next-on-pages`, output directory `.vercel/output/static`) is a one-time setup step not yet done.
+
+Note: `.npmrc` sets `legacy-peer-deps=true` because `@cloudflare/next-on-pages`'s peer range doesn't yet officially support Next 16 — see the comment in that file before removing it.
