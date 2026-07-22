@@ -9,6 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Cloudflare Pages (via @cloudflare/next-on-pages) requires non-static app
+// routes to opt into the Edge Runtime.
+export const runtime = "edge";
+
 const PdfViewer = dynamic(() => import("@/components/materials/PdfViewer").then((m) => m.PdfViewer), {
   ssr: false,
   loading: () => <Skeleton className="h-96 w-full" />,
